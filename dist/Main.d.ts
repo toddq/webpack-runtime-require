@@ -7,6 +7,7 @@ export declare var moduleIDs: {
 export declare var moduleNames: {
     [key: number]: string;
 };
+export declare var modulePaths: any[];
 export declare function ParseModuleData(forceRefresh?: boolean): void;
 export declare function GetIDForModule(name: string): string | number;
 export declare function Require(name: string): any;

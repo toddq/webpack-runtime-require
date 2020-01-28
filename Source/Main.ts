@@ -43,6 +43,7 @@ if (g.webpackData == null) {
 export var allModulesText: string;
 export var moduleIDs = {} as {[key: string]: number | string};
 export var moduleNames = {} as {[key: number]: string};
+export var modulePaths = [];
 export function ParseModuleData(forceRefresh = false) {
 	if (allModulesText != null && !forceRefresh) return;
 
@@ -86,12 +87,13 @@ export function ParseModuleData(forceRefresh = false) {
 		}
 	}
 
-	MakeGlobal({allModulesText, moduleIDs, moduleNames});
+	MakeGlobal({allModulesText, moduleIDs, moduleNames, modulePaths});
 }
 
 function AddModuleEntry(moduleID: string | number, moduleName: string) {
 	moduleIDs[moduleName] = moduleID;
 	moduleNames[moduleID] = moduleName;
+	modulePaths.push(moduleID);
 
 	// replace certain characters with underscores, so the module-entries can show in console auto-complete
 	let moduleName_simple = moduleName.replace(/-/g, "_");
@@ -107,13 +109,17 @@ function GetModuleExports(moduleID: number | string) {
 MakeGlobal({GetIDForModule});
 export function GetIDForModule(name: string) {
 	ParseModuleData();
-	return moduleIDs[name];
+	let id = moduleIDs[name];
+	if (!id) {
+		id = modulePaths.find(path => path.includes(name));
+	}
+	return id;
 }
 
 MakeGlobal({Require});
 export function Require(name: string) {
 	if (name === undefined)
-		return void ParseModuleData();
+		return void ParseModuleData(true);
 
 	let id = GetIDForModule(name);
 	if (id == null) return "[could not find the given module]";

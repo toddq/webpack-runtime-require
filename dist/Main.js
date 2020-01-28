@@ -52,21 +52,21 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(1);
 
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.moduleNames = exports.moduleIDs = exports.allModulesText = exports.GetModuleNameFromVarName = exports.GetModuleNameFromPath = undefined;
+	exports.modulePaths = exports.moduleNames = exports.moduleIDs = exports.allModulesText = exports.GetModuleNameFromVarName = exports.GetModuleNameFromPath = undefined;
 
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
@@ -90,24 +90,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // if included using `module: "src/Main.ts"`, we can access webpack-data directly
 	    if (typeof __webpack_require__ != "undefined" && __webpack_require__.m.length > 2) {
 	        g.webpackData = __webpack_require__;
-	    } else if (g.webpackJsonp) {
-	        var webpackVersion = g.webpackJsonp.length == 2 ? 1 : 2;
-	        if (webpackVersion == 1) {
-	            g.webpackJsonp([], { 0: function _(module, exports, __webpack_require__) {
-	                    g.webpackData = __webpack_require__;
-	                } });
-	        } else {
-	            g.webpackJsonp([], { 123456: function _(module, exports, __webpack_require__) {
-	                    g.webpackData = __webpack_require__;
-	                } }, [123456]);
-	        }
-	    } else {
-	        throw new Error("window.webpackData must be set for webpack-runtime-require to function." + "\n" + "You can do so either by setting it directly (to __webpack_require__), or by making window.webpackJsonp available. (eg. using CommonsChunkPlugin)");
 	    }
+	    // else, try to access it using webpackJsonp (the function only seems to be available if CommonsChunkPlugin is used)
+	    else if (g.webpackJsonp) {
+	            var webpackVersion = g.webpackJsonp.length == 2 ? 1 : 2;
+	            if (webpackVersion == 1) {
+	                g.webpackJsonp([], { 0: function _(module, exports, __webpack_require__) {
+	                        g.webpackData = __webpack_require__;
+	                    } });
+	            } else {
+	                g.webpackJsonp([], { 123456: function _(module, exports, __webpack_require__) {
+	                        g.webpackData = __webpack_require__;
+	                    } }, [123456]);
+	            }
+	        }
+	        // else, give up and throw error
+	        else {
+	                throw new Error("window.webpackData must be set for webpack-runtime-require to function." + "\n" + "You can do so either by setting it directly (to __webpack_require__), or by making window.webpackJsonp available. (eg. using CommonsChunkPlugin)");
+	            }
 	}
 	var allModulesText = exports.allModulesText = undefined;
 	var moduleIDs = exports.moduleIDs = {};
 	var moduleNames = exports.moduleNames = {};
+	var modulePaths = exports.modulePaths = [];
 	function ParseModuleData() {
 	    var forceRefresh = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
@@ -167,11 +172,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            AddModuleEntry(parseInt(idStr), (0, _Utils.GetModuleNameFromVarName)(varName));
 	        }
 	    }
-	    MakeGlobal({ allModulesText: allModulesText, moduleIDs: moduleIDs, moduleNames: moduleNames });
+	    MakeGlobal({ allModulesText: allModulesText, moduleIDs: moduleIDs, moduleNames: moduleNames, modulePaths: modulePaths });
 	}
 	function AddModuleEntry(moduleID, moduleName) {
 	    moduleIDs[moduleName] = moduleID;
 	    moduleNames[moduleID] = moduleName;
+	    modulePaths.push(moduleID);
 	    // replace certain characters with underscores, so the module-entries can show in console auto-complete
 	    var moduleName_simple = moduleName.replace(/-/g, "_");
 	    // make sure we add the module under a unique name
@@ -186,20 +192,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	MakeGlobal({ GetIDForModule: GetIDForModule });
 	function GetIDForModule(name) {
 	    ParseModuleData();
-	    return moduleIDs[name];
+	    var id = moduleIDs[name];
+	    if (!id) {
+	        id = modulePaths.find(function (path) {
+	            return path.includes(name);
+	        });
+	    }
+	    return id;
 	}
 	MakeGlobal({ Require: Require });
 	function Require(name) {
-	    if (name === undefined) return void ParseModuleData();
+	    if (name === undefined) return void ParseModuleData(true);
 	    var id = GetIDForModule(name);
 	    if (id == null) return "[could not find the given module]";
 	    return GetModuleExports(id);
 	}
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 
@@ -233,7 +245,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return moduleName;
 	}
 
-/***/ }
+/***/ })
 /******/ ])
 });
 ;
