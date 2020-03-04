@@ -55,7 +55,7 @@ export function ParseModuleData(forceRefresh = false) {
 	// 		require("./Source/MyComponent") => var _MyComponent = __webpack_require__(/*! ./Source/MyComponent */ 200);
 	//let requiresWithPathCommentsRegex = /__webpack_require__\(\/\*! ((?:.(?!\*))+) \*\/ (["'0-9a-zA-Z\/.-]+)\)/g;
 	//let requiresWithPathCommentsRegex = /__webpack_require__\(\/\*! ((?:.(?!\*))+) \*\/ ["']?([^"'\)]+)["']?\)/g;
-	let requiresWithPathCommentsRegex = /__webpack_require__\(\/\*! (.+?) \*\/ ["']?([^"'\)]+?)["']?\)/g;
+	let requiresWithPathCommentsRegex = /__webpack_require__\(\/\*! (.+?) \*\/ ?["']?([^"'\)]+?)["']?\)/g;
 	// these are examples of before and after webpack's transformation: (based on which the 2nd regex below finds paths)
 	// 		require("jquery") => __webpack_require__("jquery")
 	//let requiresWithPathsRegex = /__webpack_require__\([^")]*"(.+?)"\)/g;
